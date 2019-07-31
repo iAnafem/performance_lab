@@ -10,9 +10,9 @@ class Point:
         self.y = _list[1]
 
 
-class Rectangle:
+class Quadrilateral:
     def __init__(self, edges):
-        self.rectangle = mpl_path.Path(numpy.array(edges))
+        self.quadrilateral = mpl_path.Path(numpy.array(edges))
         self.points = list()
         self.max_x = max([i[0] for i in edges])
         self.min_x = min([i[0] for i in edges])
@@ -21,9 +21,9 @@ class Rectangle:
         for edge in edges:
             self.points.append(Point(edge))
         self.left_bottom = self.points[0]
-        self.right_bottom = self.points[1]
+        self.left_top = self.points[1]
         self.right_top = self.points[2]
-        self.left_top = self.points[3]
+        self.right_bottom = self.points[3]
 
     def point_on_edge(self, point: Point) -> bool:
         for edge in self.points:
@@ -31,31 +31,35 @@ class Rectangle:
                 return True
 
     def point_on_side(self, point: Point) -> bool:
+        """
+        I know that this is crazy, but I do not know how to check in another way
+        whether the points on the sides of the quadrilateral lie ...
+        """
         if (
                 (point.x - self.left_bottom.x) *
                 (self.right_bottom.y - self.left_bottom.y) -
                 (self.right_bottom.x - self.left_bottom.x) *
                 (point.y - self.left_bottom.y)
-        ) == 0 or (
+        ) == 0 and self.left_bottom.x <= point.x <= self.right_bottom.x or (
                 (point.x - self.left_top.x) *
                 (self.right_top.y - self.left_top.y) -
                 (self.right_top.x - self.left_top.x) *
                 (point.y - self.left_top.y)
-        ) == 0 or (
+        ) == 0 and self.left_top.x <= point.x <= self.right_top.x or (
                 (point.x - self.right_bottom.x) *
                 (self.right_top.y - self.right_bottom.y) -
                 (self.right_top.x - self.right_bottom.x) *
                 (point.y - self.right_bottom.y)
-        ) == 0 or (
+        ) == 0 and self.left_bottom.y <= point.y <= self.left_top.y or (
                 (point.x - self.left_bottom.x) *
-                (self.left_top.y - self.left_top.y) -
+                (self.left_top.y - self.left_bottom.y) -
                 (self.left_top.x - self.left_bottom.x) *
                 (point.y - self.left_bottom.y)
-        ) == 0:
+        ) == 0 and self.right_bottom.y <= point.y <= self.right_top.y:
             return True
 
     def point_inside(self, point: Point) -> bool:
-        return self.rectangle.contains_point(point.coordinates)
+        return self.quadrilateral.contains_point(point.coordinates, radius=0.1)
 
 
 def get_points(test_file: str) -> list:
@@ -64,46 +68,27 @@ def get_points(test_file: str) -> list:
 
 
 def solution(test_file1, test_file2):
-    rectangle = Rectangle(get_points(test_file1))
-    print(rectangle.max_x)
-    print(rectangle.min_x)
-    print(rectangle.max_y)
-    print(rectangle.min_y)
-    print(rectangle.rectangle)
+    quadrilateral = Quadrilateral(get_points(test_file1))
     points = get_points(test_file2)
     result = []
     for point in points:
         _point = Point(point)
-        if rectangle.point_on_edge(_point):
-            print(_point.coordinates)
-            print(0)
+        if quadrilateral.point_on_edge(_point):
             result.append(0)
-        elif (
-                rectangle.point_on_side(_point)
-                and rectangle.min_x <= _point.x <= rectangle.max_x
-                and rectangle.min_y <= _point.y <= rectangle.max_y
-        ):
-            print(_point.coordinates)
-            print(1)
+        elif not quadrilateral.point_on_edge(_point) and quadrilateral.point_on_side(_point):
             result.append(1)
-        elif rectangle.point_inside(_point):
-            print(_point.coordinates)
-            print(2)
+        elif quadrilateral.point_inside(_point):
             result.append(2)
         else:
-            print(_point.coordinates)
-            print(3)
             result.append(3)
     return result
 
 
 if __name__ == '__main__':
-    print(get_points(sys.argv[1]))
-    print(get_points(sys.argv[2]))
     for res in solution(sys.argv[1], sys.argv[2]):
-        continue
+        print(res)
 
-    # assert solution(sys.argv[1], sys.argv[2]) == [2, 3, 1, 0, 3]
+    assert solution(sys.argv[1], sys.argv[2]) == [2, 3, 1, 0, 3, 1, 1, 1, 1, 3]
 
 
 
