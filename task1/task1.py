@@ -15,8 +15,12 @@ def solution(test_file: str):
 
 
 if __name__ == '__main__':
-    for number in solution(sys.argv[1]):
-        print('{:0.2f}'.format(number))
+    try:
+        for number in solution(sys.argv[1]):
+            print('{:0.2f}'.format(number))
 
+        assert list(solution(sys.argv[1])) == [8.20, 5.00, 10.00, 0.00, 4.50]
 
-assert list(solution(sys.argv[1])) == [8.20, 5.00, 10.00, 0.00, 4.50]
+    except (FileNotFoundError, TypeError):
+        print('No such a file or directory')
+
