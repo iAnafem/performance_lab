@@ -14,6 +14,10 @@ class Rectangle:
     def __init__(self, edges):
         self.rectangle = mpl_path.Path(numpy.array(edges))
         self.points = list()
+        self.max_x = max([i[0] for i in edges])
+        self.min_x = min([i[0] for i in edges])
+        self.max_y = max([i[0] for i in edges])
+        self.min_y = min([i[0] for i in edges])
         for edge in edges:
             self.points.append(Point(edge))
         self.left_bottom = self.points[0]
@@ -61,6 +65,10 @@ def get_points(test_file: str) -> list:
 
 def solution(test_file1, test_file2):
     rectangle = Rectangle(get_points(test_file1))
+    print(rectangle.max_x)
+    print(rectangle.min_x)
+    print(rectangle.max_y)
+    print(rectangle.min_y)
     print(rectangle.rectangle)
     points = get_points(test_file2)
     result = []
@@ -70,7 +78,11 @@ def solution(test_file1, test_file2):
             print(_point.coordinates)
             print(0)
             result.append(0)
-        elif rectangle.point_on_side(_point):
+        elif (
+                rectangle.point_on_side(_point)
+                and rectangle.min_x <= _point.x <= rectangle.max_x
+                and rectangle.min_y <= _point.y <= rectangle.max_y
+        ):
             print(_point.coordinates)
             print(1)
             result.append(1)
