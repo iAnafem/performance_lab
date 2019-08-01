@@ -64,7 +64,7 @@ class Quadrilateral:
 
 def get_points(test_file: str) -> list:
     with open(test_file) as file:
-        return [[float(i[0]), float(i[1])] for line in file for i in [line.rstrip()[:-2].split(' ')]]
+        return [[float(i[0]), float(i[1])] for line in file for i in [line.rstrip()[:-2].split(' ')] if line != '\n']
 
 
 def solution(test_file1, test_file2):
@@ -87,8 +87,6 @@ def solution(test_file1, test_file2):
 if __name__ == '__main__':
     for res in solution(sys.argv[1], sys.argv[2]):
         print(res)
-
-    assert solution(sys.argv[1], sys.argv[2]) == [2, 3, 1, 0, 3, 1, 1, 1, 1, 3]
 
 
 
